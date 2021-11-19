@@ -17,7 +17,21 @@ module.exports = {
 				red: { DEFAULT: '#F22828', 100: '#FFF4F4' },
 				white: { DEFAULT: '#ffffff', sheer: '#E4E4E4' },
 			},
-			fontFamily: { sans: ['Duplicate Sans', 'sans-serif'] },
+			dropShadow: {
+				first:
+					'0px 4.34461px 4.34461px rgba(50, 50, 71, 0.08) 0px 4.34461px 8.68923px rgba(50, 50, 71, 0.06)',
+				l1: '0px 4.34461px 4.34461px rgba(50, 50, 71, 0.08)',
+				l2: '0px 4.34461px 8.68923px rgba(50, 50, 71, 0.06)',
+			},
+			fontFamily: {
+				sans: [
+					'Duplicate Sans',
+					'ui-sans-serif',
+					'system-ui',
+					'-apple-system',
+					'sans-serif',
+				],
+			},
 		},
 	},
 	variants: {
