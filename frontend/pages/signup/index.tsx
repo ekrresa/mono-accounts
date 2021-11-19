@@ -32,7 +32,9 @@ export default function SignUp() {
 					/>
 
 					<p className="my-6 opacity-70 font-light text-right text-sm">
-						I forgot my password
+						<Link href="/forgot_password" passHref>
+							<a>I forgot my password</a>
+						</Link>
 					</p>
 
 					<button className="bg-blue font-light py-3 rounded-md text-white text-[1.06rem] w-full filter drop-shadow-first">

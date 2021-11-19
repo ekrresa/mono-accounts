@@ -24,7 +24,9 @@ export default function Login() {
 					<div className="flex justify-between my-6">
 						<CheckBox label="Remember me" onChange={() => {}} />
 						<p className="opacity-70 font-light text-right text-sm">
-							I forgot my password
+							<Link href="/forgot_password" passHref>
+								<a>I forgot my password</a>
+							</Link>
 						</p>
 					</div>
 
