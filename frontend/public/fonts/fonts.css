@@ -1,0 +1,49 @@
+@font-face {
+  font-family: "Duplicate Sans";
+  src: local("Duplicate Sans Bold"), local("DuplicateSans-Bold"),
+    url("DuplicateSans-Bold.woff2") format("woff2"),
+    url("DuplicateSans-Bold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Duplicate Sans";
+  src: local("Duplicate Sans Medium"), local("DuplicateSans-Medium"),
+    url("DuplicateSans-Medium.woff2") format("woff2"),
+    url("DuplicateSans-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Duplicate Sans";
+  src: local("Duplicate Sans Thin"), local("DuplicateSans-Thin"),
+    url("DuplicateSans-Thin.woff2") format("woff2"),
+    url("DuplicateSans-Thin.woff") format("woff");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Duplicate Sans";
+  src: local("Duplicate Sans"), local("DuplicateSans"),
+    url("DuplicateSans.woff2") format("woff2"),
+    url("DuplicateSans.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Duplicate Sans";
+  src: local("Duplicate Sans Light"), local("DuplicateSans-Light"),
+    url("DuplicateSans-Light.woff2") format("woff2"),
+    url("DuplicateSans-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
