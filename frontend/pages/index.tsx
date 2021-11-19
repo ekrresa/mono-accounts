@@ -1,3 +1,21 @@
+import { DASHBOARD } from '../constants/routes';
+import LogoLight from '../public/images/logo-light.svg';
+
 export default function Home() {
-  return <div className=""></div>;
+	return (
+		<main className="flex">
+			<aside className="bg-black-100 sticky top-0 left-0 flex-col flex-shrink-0 h-screen px-16 overflow-y-auto w-72">
+				<div className="py-16">
+					<LogoLight className="w-32" />
+				</div>
+
+				<div className="opacity-50 text-white">
+					{Object.keys(DASHBOARD).map(key => (
+						<div className="pb-8 text-[1.375rem] last:pb-0">{key}</div>
+					))}
+				</div>
+			</aside>
+			<section className="flex-1"></section>
+		</main>
+	);
 }
