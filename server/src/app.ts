@@ -6,11 +6,11 @@ import cors from 'cors';
 import pinoHttp from 'pino-http';
 import createHttpError from 'http-errors';
 
+import { ErrorHandler } from './config/error';
 import { logger } from './config/logger';
 
-const loggerMiddleware = pinoHttp({ logger });
-
 const app = express();
+const loggerMiddleware = pinoHttp({ logger });
 
 app.use(cors());
 
@@ -24,6 +24,6 @@ app.use((_req, _res, next) => {
 	next(createHttpError(404, { message: 'Resource not found' }));
 });
 
-// app.use(ErrorHandler);
+app.use(ErrorHandler);
 
 export default app;

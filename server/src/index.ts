@@ -1,10 +1,10 @@
 import httpGracefulShutdown from 'http-graceful-shutdown';
 
 import app from './app';
-import { exitErrorHandler } from './config/error';
-import { logger } from './config/logger';
-import { env } from './config/env';
 import { connectToDatabase, disconnectDB } from './config/database';
+import { exitErrorHandler } from './config/error';
+import { env } from './config/env';
+import { logger } from './config/logger';
 
 process.on('unhandledRejection', (reason: any) => {
 	exitErrorHandler(reason);
