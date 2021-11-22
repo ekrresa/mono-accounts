@@ -1,12 +1,15 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../modules/user/user.schema';
 
-export async function createTokens(user: User) {
-	const accessToken = jwt.sign({ id: user.id }, user.access_token_secret, {
+export async function createSecurityTokens(
+	userId: string,
+	accessTokenSecret: string,
+	refreshTokenSecret: string
+) {
+	const accessToken = jwt.sign({ id: userId }, accessTokenSecret, {
 		expiresIn: '5m',
 	});
 
-	const refreshToken = jwt.sign({ id: user.id }, user.access_token_secret, {
+	const refreshToken = jwt.sign({ id: userId }, refreshTokenSecret, {
 		expiresIn: '24h',
 	});
 

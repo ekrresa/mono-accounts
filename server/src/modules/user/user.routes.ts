@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { validateSchema } from '../../utils/middleware';
 import * as UserControllers from './user.controllers';
-import { UserInputSchema } from './user.schema';
+import { LoginInputSchema, UserInputSchema } from './user.schema';
+import { validateSchema } from '../../utils/middleware';
 
 const router = Router({ mergeParams: true });
 
-// router.post('/login', (req, res) => {});
+router.post('/login', validateSchema(LoginInputSchema), UserControllers.loginHandler);
 router.post('/signup', validateSchema(UserInputSchema), UserControllers.signUpHandler);
 // router.post('/forgotPassword', (req, res) => {});
 // router.post('/resetPassword', (req, res) => {});
