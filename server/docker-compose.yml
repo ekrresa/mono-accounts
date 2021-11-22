@@ -1,0 +1,19 @@
+version: '3.6'
+
+services:
+  database:
+    container_name: db_container
+    image: 'bitnami/mongodb:latest'
+    volumes:
+      - mongodb_data:/bitnami/mongodb
+    ports:
+      - 27017:27017
+    environment:
+      - MONGODB_USERNAME=ekrresa
+      - MONGODB_ROOT_PASSWORD=password123
+      - MONGODB_PASSWORD=password123
+      - MONGODB_DATABASE=mono_db
+
+volumes:
+  mongodb_data:
+    driver: 'local'
