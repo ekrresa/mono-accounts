@@ -15,7 +15,6 @@
 	"keywords": [],
 	"license": "ISC",
 	"dependencies": {
-		"@humanwhocodes/env": "^2.2.0",
 		"bcrypt": "^5.0.1",
 		"cls-hooked": "^4.2.2",
 		"compression": "^1.7.4",

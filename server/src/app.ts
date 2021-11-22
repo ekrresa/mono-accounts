@@ -8,9 +8,10 @@ import createHttpError from 'http-errors';
 
 import { ErrorHandler } from './config/error';
 import { logger } from './config/logger';
+import ApiRouter from './routes';
 
 const app = express();
-const loggerMiddleware = pinoHttp({ logger });
+const loggerMiddleware = pinoHttp({ logger, useLevel: 'http' });
 
 app.use(cors());
 
@@ -19,6 +20,8 @@ app.use(loggerMiddleware);
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api', ApiRouter);
 
 app.use((_req, _res, next) => {
 	next(createHttpError(404, { message: 'Resource not found' }));

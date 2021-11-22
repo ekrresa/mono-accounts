@@ -7,7 +7,7 @@ import { env } from './config/env';
 import { logger } from './config/logger';
 
 process.on('unhandledRejection', (reason: any) => {
-	exitErrorHandler(reason);
+	throw reason;
 });
 
 process.on('uncaughtException', err => {
