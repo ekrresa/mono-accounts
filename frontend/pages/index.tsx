@@ -11,7 +11,9 @@ export default function Home() {
 
 				<div className="opacity-50 text-white">
 					{Object.keys(DASHBOARD).map(key => (
-						<div className="pb-8 text-[1.375rem] last:pb-0">{key}</div>
+						<div key={key} className="pb-8 text-[1.375rem] last:pb-0">
+							{key}
+						</div>
 					))}
 				</div>
 			</aside>
