@@ -19,7 +19,7 @@ export async function login(loginInput: LoginInput) {
 		throw new Unauthorized('Invalid email or password');
 	}
 
-	return _.pick(user, ['id', 'access_token_secret', 'refresh_token_secret']);
+	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
 }
 
 export async function signUp(userInput: UserInput) {
@@ -50,5 +50,5 @@ export async function signUp(userInput: UserInput) {
 	});
 
 	await UserRepo.createUser(user);
-	return _.pick(user, ['id', 'access_token_secret', 'refresh_token_secret']);
+	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
 }

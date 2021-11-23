@@ -4,8 +4,8 @@ import { ApiResponse } from '../../types';
 import { createSecurityTokens } from '../../utils/auth';
 
 export async function loginHandler(req: Request, res: ApiResponse) {
-	const { id, access_token_secret, refresh_token_secret } = await UserService.login(req.body);
-	const userToken = await createSecurityTokens(id, access_token_secret, refresh_token_secret);
+	const result = await UserService.login(req.body);
+	const userToken = await createSecurityTokens(result);
 
 	res.set('x-access-token', userToken.accessToken);
 	res.set('x-refresh-token', userToken.refreshToken);
@@ -14,8 +14,8 @@ export async function loginHandler(req: Request, res: ApiResponse) {
 }
 
 export async function signUpHandler(req: Request, res: ApiResponse) {
-	const { id, access_token_secret, refresh_token_secret } = await UserService.signUp(req.body);
-	const userToken = await createSecurityTokens(id, access_token_secret, refresh_token_secret);
+	const result = await UserService.signUp(req.body);
+	const userToken = await createSecurityTokens(result);
 
 	res.set('x-access-token', userToken.accessToken);
 	res.set('x-refresh-token', userToken.refreshToken);
