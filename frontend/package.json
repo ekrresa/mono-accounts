@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mono.co/connect.js": "^0.2.2",
     "@reach/checkbox": "^0.16.0",
     "axios": "^0.24.0",
     "formik": "^2.2.9",
