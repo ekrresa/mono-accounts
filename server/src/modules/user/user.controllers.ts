@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import * as UserService from './user.service';
 import { ApiResponse } from '../../types';
-import { createSecurityTokens } from '../../utils/auth';
+import { createSecurityTokens } from './user.utils';
 
 export async function loginHandler(req: Request, res: ApiResponse) {
 	const result = await UserService.login(req.body);

@@ -6,6 +6,21 @@ import * as UserRepo from './user.repository';
 import { LoginInput, UserInput } from './user.schema';
 import { generateRandomString, generateUserId } from '../../utils';
 
+export async function refreshUserSecrets(userId: string) {
+	const accessTokenSecretPromise = generateRandomString();
+	const refreshTokenSecretPromise = generateRandomString();
+
+	const [accessTokenSecret, refreshTokenSecret] = await Promise.all([
+		accessTokenSecretPromise,
+		refreshTokenSecretPromise,
+	]);
+
+	return await UserRepo.updateUser(userId, {
+		access_token_secret: accessTokenSecret,
+		refresh_token_secret: refreshTokenSecret,
+	});
+}
+
 export async function login(loginInput: LoginInput) {
 	const user = await UserRepo.getUserByEmail(loginInput.email);
 

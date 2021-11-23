@@ -10,9 +10,13 @@ export async function createUser(user: User) {
 }
 
 export async function getUser(userId: string) {
-	return await UserModel.findOne({ id: userId });
+	return await UserModel.findOne({ id: userId }).lean();
 }
 
 export async function getUserByEmail(email: string) {
-	return await UserModel.findOne({ email });
+	return await UserModel.findOne({ email }).lean();
+}
+
+export async function updateUser(userId: string, payload: Partial<User>) {
+	return await UserModel.findOneAndUpdate({ id: userId }, payload, { new: true }).lean();
 }
