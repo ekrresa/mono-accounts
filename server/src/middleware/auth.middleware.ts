@@ -31,7 +31,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 	}
 
 	jwt.verify(token, user.access_token_secret, async (err, payload) => {
-		if (err?.name === 'TokenExpiredError') {
+		if (err && err.name === 'TokenExpiredError') {
 			const securityPayload = _.pick(user, ['id', 'access_token_secret', 'refresh_token_secret']);
 			const userToken = await createSecurityTokens(securityPayload);
 
@@ -39,7 +39,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 			res.set('x-refresh-token', userToken.refreshToken);
 		}
 
-		if (err?.name !== 'TokenExpiredError') {
+		if (err && err.name !== 'TokenExpiredError') {
 			throw new Unauthorized('Please login');
 		}
 
