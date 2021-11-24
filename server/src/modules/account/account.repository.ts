@@ -12,3 +12,7 @@ export async function saveAccount(account: Account & AccountInfo) {
 export async function getAccount(accountId: string) {
 	return await AccountModel.findOne({ account_id: accountId }).lean();
 }
+
+export async function getUserAccounts(userId: string) {
+	return await AccountModel.find({ user_id: userId }).select('-bvn').lean();
+}

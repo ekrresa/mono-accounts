@@ -31,3 +31,7 @@ export async function fetchAccountInfo(accountId: string): Promise<AccountInfo> 
 	const result = await axiosInstance.get(`/accounts/${accountId}`);
 	return result.data.account;
 }
+
+export async function getUserAccounts(userId: string) {
+	return await AccountRepo.getUserAccounts(userId);
+}

@@ -1,15 +1,21 @@
 import { Router } from 'express';
 import * as AccountControllers from './account.controllers';
 import { ensureUserIsAuthenticated } from '../../middleware/auth.middleware';
-import { validateSchema } from '../../middleware/validation.middleware';
-import { AccountInputSchema } from './account.schema';
+import { validateReqParams, validateSchema } from '../../middleware/validation.middleware';
+import { AccountInputSchema, userIdSchema } from './account.schema';
 
 const router = Router({ mergeParams: true });
+
+router.get(
+	'/user/:user_id',
+	[ensureUserIsAuthenticated, validateReqParams(userIdSchema)],
+	AccountControllers.getUserAccountsHandler
+);
 
 router.post(
 	'/link',
 	[ensureUserIsAuthenticated, validateSchema(AccountInputSchema)],
-	AccountControllers.loginAccountHandler
+	AccountControllers.linkAccountHandler
 );
 
 export default router;
