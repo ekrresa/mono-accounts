@@ -9,8 +9,6 @@ export const UserSchema = z.object({
 	access_token_secret: z.string(),
 	refresh_token_secret: z.string(),
 	last_login: z.date().optional(),
-	created_at: z.date().optional(),
-	updated_at: z.date().optional(),
 });
 
 export const UserInputSchema = z.object({
@@ -32,4 +30,4 @@ export const LoginInputSchema = z.object({
 export type User = z.infer<typeof UserSchema>;
 export type UserInput = z.infer<typeof UserInputSchema>;
 export type LoginInput = z.infer<typeof LoginInputSchema>;
-export type UserSession = Pick<User, 'first_name'> & { userId: string };
+export type UserSession = Pick<User, 'first_name'> & { user_id: string };
