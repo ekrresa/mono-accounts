@@ -35,3 +35,7 @@ export async function fetchAccountInfo(accountId: string): Promise<AccountInfo> 
 export async function getUserAccounts(userId: string) {
 	return await AccountRepo.getUserAccounts(userId);
 }
+
+export async function unlinkAccount(accountId: string) {
+	return await AccountRepo.deleteAccount(accountId);
+}

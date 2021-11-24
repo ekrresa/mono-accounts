@@ -16,3 +16,7 @@ export async function getAccount(accountId: string) {
 export async function getUserAccounts(userId: string) {
 	return await AccountModel.find({ user_id: userId }).select('-bvn').lean();
 }
+
+export async function deleteAccount(accountId: string) {
+	return await AccountModel.findOneAndDelete({ account_id: accountId }).lean();
+}

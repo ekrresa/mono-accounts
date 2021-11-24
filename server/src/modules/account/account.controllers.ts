@@ -13,3 +13,9 @@ export async function getUserAccountsHandler(req: Request, res: ApiResponse) {
 
 	res.status(200).json({ status: 200, message: 'user accounts fetched', data: userAccounts });
 }
+
+export async function unlinkAccountHandler(req: Request, res: ApiResponse) {
+	await AccountService.unlinkAccount(req.params.account_id);
+
+	res.status(200).json({ status: 200, message: 'account deleted' });
+}

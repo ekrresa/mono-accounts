@@ -11,7 +11,8 @@ export const AccountInputSchema = z.object({
 	user_id: z.string(),
 });
 
-export const userIdSchema = AccountInputSchema.pick({ user_id: true });
+export const userIdSchema = AccountSchema.pick({ user_id: true });
+export const accountIdSchema = AccountSchema.pick({ account_id: true });
 
 const AccountInfoSchema = z.object({
 	_id: z.string().optional(),
