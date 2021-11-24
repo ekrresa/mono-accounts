@@ -1,10 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
-import { Unauthorized } from 'http-errors';
+import { Forbidden, Unauthorized } from 'http-errors';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 
 import { getUser } from '../modules/user/user.repository';
-import { createSecurityTokens, session, setLoggedInUser } from '../modules/user/user.utils';
+import {
+	createSecurityTokens,
+	getLoggedInUser,
+	session,
+	setLoggedInUser,
+} from '../modules/user/user.utils';
 
 interface JwtAuthPayload {
 	user_id: string;
@@ -61,6 +66,21 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 			next();
 		});
 	});
+}
+
+// ensures the request is coming from the user and not a third party.
+export async function ensureUserAuthority(req: Request, _res: Response, next: NextFunction) {
+	const currentUser = getLoggedInUser();
+
+	if (!currentUser) {
+		throw new Forbidden('Please login');
+	}
+
+	if (currentUser.user_id !== req.params.user_id) {
+		throw new Forbidden('No permissions to make this request');
+	}
+
+	next();
 }
 
 function getAccessToken(req: Request) {

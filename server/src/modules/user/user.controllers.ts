@@ -22,3 +22,9 @@ export async function signUpHandler(req: Request, res: ApiResponse) {
 
 	res.status(201).json({ status: 201, message: 'user registered successfully' });
 }
+
+export async function deleteUserHandler(req: Request, res: ApiResponse) {
+	await UserService.deleteUser(req.params.user_id);
+
+	res.status(200).json({ status: 200, message: 'account deleted successfully' });
+}
