@@ -8,17 +8,28 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mono.co/connect.js": "^0.2.2",
     "@reach/checkbox": "^0.16.0",
+    "@reduxjs/toolkit": "^1.6.2",
+    "axios": "^0.24.0",
+    "formik": "^2.2.9",
+    "jwt-decode": "^3.1.2",
+    "localforage": "^1.10.0",
     "next": "12.0.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-hot-toast": "^2.1.1",
     "react-icons": "^4.3.1",
+    "react-query": "^3.33.4",
+    "react-redux": "^7.2.6",
+    "redux-persist": "^6.0.0",
     "styled-components": "^5.3.3"
   },
   "devDependencies": {
     "@svgr/webpack": "^5.5.0",
     "@types/node": "16.11.9",
     "@types/react": "17.0.35",
+    "@types/react-redux": "^7.1.20",
     "@types/styled-components": "^5.1.15",
     "autoprefixer": "^10.4.0",
     "eslint": "7.32.0",

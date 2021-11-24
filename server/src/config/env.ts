@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 const envSchema = z.object({
 	DATABASE_URL: z.string(),
+	MONO_SECRET_KEY: z.string(),
 	NODE_ENV: z.string(),
 	PORT: z.string(),
 });
