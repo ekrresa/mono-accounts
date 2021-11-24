@@ -1,7 +1,8 @@
 import { BadRequest } from 'http-errors';
+import _ from 'lodash';
 
 import * as AccountRepo from './account.repository';
-import { AccountInput } from './account.schema';
+import { AccountInfo, AccountInput } from './account.schema';
 import { axiosInstance } from '../../utils/request';
 import { generateUserId } from '../../utils';
 
@@ -16,9 +17,17 @@ export async function linkAccount(input: AccountInput) {
 		throw new BadRequest('Account already exists');
 	}
 
+	const accountInfo = await fetchAccountInfo(accountId);
+
 	await AccountRepo.saveAccount({
 		id,
 		account_id: result.data.id,
 		user_id: input.user_id,
+		..._.omit(accountInfo, ['_id']),
 	});
+}
+
+export async function fetchAccountInfo(accountId: string): Promise<AccountInfo> {
+	const result = await axiosInstance.get(`/accounts/${accountId}`);
+	return result.data.account;
 }
