@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-export default function useMonoWidget() {
+export function useMonoWidget() {
 	const [scriptLoaded, setScriptLoaded] = useState(false);
 	const [authCode, setAuthCode] = useState('');
 
@@ -11,6 +11,11 @@ export default function useMonoWidget() {
 			key: process.env.NEXT_PUBLIC_MONO_PUBLIC_KEY,
 			onClose: () => console.log('Widget closed'),
 			onLoad: () => setScriptLoaded(true),
+			onEvent: (eventName: string) => {
+				if (eventName === 'INSTITUTION_SELECTED') {
+					// display toasts showing test otp and security answer
+				}
+			},
 			onSuccess: ({ code }: { code: string }) => setAuthCode(code),
 		});
 
