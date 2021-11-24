@@ -8,7 +8,7 @@ import { User } from './user.schema';
 export async function createSecurityTokens(payload: Partial<User>) {
 	const userData = {
 		..._.omit(payload, ['id', 'access_token_secret', 'refresh_token_secret']),
-		userId: payload.id,
+		user_id: payload.id,
 	};
 
 	const accessToken = jwt.sign(userData, payload.access_token_secret!, {

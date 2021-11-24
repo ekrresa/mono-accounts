@@ -7,14 +7,15 @@ import { getUser } from '../modules/user/user.repository';
 import { createSecurityTokens, session, setLoggedInUser } from '../modules/user/user.utils';
 
 interface JwtAuthPayload {
-	userId: string;
+	user_id: string;
 	first_name: string;
 }
 
 export async function ensureUserIsAuthenticated(req: Request, res: Response, next: NextFunction) {
 	const token = getAccessToken(req);
+	const refreshToken = getRefreshToken(req);
 
-	if (!token) {
+	if (!token || !refreshToken) {
 		throw new Unauthorized('Please login');
 	}
 
@@ -24,7 +25,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 		throw new Unauthorized('Please login');
 	}
 
-	const user = await getUser(userData.userId);
+	const user = await getUser(userData.user_id);
 
 	if (!user) {
 		throw new Unauthorized('Please login');
@@ -32,7 +33,19 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 
 	jwt.verify(token, user.access_token_secret, async (err, payload) => {
 		if (err && err.name === 'TokenExpiredError') {
-			const securityPayload = _.pick(user, ['id', 'access_token_secret', 'refresh_token_secret']);
+			// validate refresh token first
+			try {
+				jwt.verify(refreshToken, user.refresh_token_secret);
+			} catch (error) {
+				throw new Unauthorized('Please login');
+			}
+
+			const securityPayload = _.pick(user, [
+				'id',
+				'first_name',
+				'access_token_secret',
+				'refresh_token_secret',
+			]);
 			const userToken = await createSecurityTokens(securityPayload);
 
 			res.set('x-access-token', userToken.accessToken);
@@ -66,4 +79,8 @@ function getAccessToken(req: Request) {
 	}
 
 	return null;
+}
+
+function getRefreshToken(req: Request) {
+	return req.headers['x-refresh-token'] as string | undefined;
 }
