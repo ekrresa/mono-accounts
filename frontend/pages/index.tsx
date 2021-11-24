@@ -37,6 +37,12 @@ export default function Home() {
 	);
 
 	useEffect(() => {
+		if (userAccounts.data && Array.isArray(userAccounts.data) && !selectedAccount) {
+			setSelectedAccount(userAccounts.data[0]);
+		}
+	}, [selectedAccount, userAccounts.data]);
+
+	useEffect(() => {
 		if (authCode) {
 			linkAccountRequest.mutate(
 				{ account_code: authCode, user_id: auth.user_id },
