@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { NextFunction, Request } from 'express';
 import { HttpError } from 'http-errors';
 import { ZodError } from 'zod';
@@ -5,10 +6,14 @@ import { ZodError } from 'zod';
 import { ApiResponse } from '../types';
 import { logger } from './logger';
 
-export function ErrorHandler(err: HttpError, _req: Request, res: ApiResponse, _next: NextFunction) {
+interface AppError extends HttpError, AxiosError {
+	status: number;
+}
+
+export function ErrorHandler(err: AppError, _req: Request, res: ApiResponse, _next: NextFunction) {
 	let data;
-	let message = err.message || 'Internal server error';
-	logger.error(err.message);
+	let message = err.response?.data.message || err.message || 'Internal server error';
+	logger.error(message);
 
 	if (err instanceof ZodError) {
 		const errorMap: Record<string, string> = {};
