@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 });
 
 interface JwtAuthPayload extends JwtPayload {
-	userId: string;
+	user_id: string;
 	first_name: string;
 }
 
@@ -22,7 +22,7 @@ axiosInstance.interceptors.response.use(response => {
 			accessToken: response.headers['x-access-token'],
 			refreshToken: response.headers['x-refresh-token'],
 			first_name: tokenPayload.first_name,
-			user_id: tokenPayload.userId,
+			user_id: tokenPayload.user_id,
 		})
 	);
 
