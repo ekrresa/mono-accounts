@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 
 import CheckBox from '../../components/CheckBox';
-import { axiosInstance } from '../../stores/auth';
+import { axiosInstance } from '../../utils/request';
 import LogoDark from '../../public/images/logo-dark.svg';
 
 export default function Login() {

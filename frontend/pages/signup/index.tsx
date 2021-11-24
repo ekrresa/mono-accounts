@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useFormik } from 'formik';
 import axios from 'axios';
 
-import { axiosInstance } from '../../stores/auth';
+import { axiosInstance } from '../../utils/request';
 import LogoDark from '../../public/images/logo-dark.svg';
 
 export default function SignUp() {
