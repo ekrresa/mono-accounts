@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { BsDot } from 'react-icons/bs';
@@ -27,8 +27,13 @@ export default function Home() {
 	const totalBalance = useAccounts(auth.user_id, getTotalBalance);
 	const userAccounts = useAccounts(auth.user_id);
 	const { authCode, openMonoWidget } = useMonoWidget();
+	const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+
 	const linkAccountRequest = useMutation((payload: any) =>
 		apiMutationHandler({ url: '/accounts/link', body: payload, method: 'POST' })
+	);
+	const unlinkAccountRequest = useMutation((payload: any) =>
+		apiMutationHandler({ url: `/accounts/${payload.accountId}`, method: 'DELETE' })
 	);
 
 	useEffect(() => {
@@ -47,6 +52,23 @@ export default function Home() {
 			);
 		}
 	}, [authCode]);
+
+	const deleteAccount = (accountId: string = '') => {
+		if (accountId) {
+			unlinkAccountRequest.mutate(
+				{ accountId },
+				{
+					onError: (err: any) => {
+						console.log(err.response);
+					},
+					onSuccess: async () => {
+						//Display toasts
+						await queryClient.invalidateQueries(accountsKeyFactory.accounts());
+					},
+				}
+			);
+		}
+	};
 
 	return (
 		<main className="flex">
@@ -120,7 +142,12 @@ export default function Home() {
 									userAccounts.data.map(account => (
 										<button
 											key={account.id}
-											className="bg-white border border-gray-200 flex items-center -ml-2 first:ml-0 justify-center h-8 w-8 rounded-full text-sm"
+											className={`border-gray-200 flex items-center -ml-2 first:ml-0 justify-center h-8 w-8 rounded-full text-sm ${
+												selectedAccount?.account_id === account.account_id
+													? 'bg-black-200 text-white relative'
+													: 'bg-white border text-black-200'
+											}`}
+											onClick={() => setSelectedAccount(account)}
 										>
 											{getBankInitials(account.institution.name)}
 										</button>
@@ -134,7 +161,12 @@ export default function Home() {
 							</button>
 						</div>
 
-						<button className="bg-red-100 font-medium px-6 py-4 rounded-xl tracking-wider text-red">
+						<button
+							className="bg-red-100 font-medium px-6 py-4 rounded-xl tracking-wider text-red"
+							onClick={() => {
+								deleteAccount(selectedAccount?.account_id);
+							}}
+						>
 							UNLINK BANK ACCOUNT
 						</button>
 					</div>

@@ -1,8 +1,8 @@
 import { axiosInstance } from '../../utils/request';
 
 interface MutationOptions {
-	body: any;
-	method: 'POST' | 'PUT';
+	body?: any;
+	method: 'POST' | 'PUT' | 'DELETE';
 	url: string;
 }
 
