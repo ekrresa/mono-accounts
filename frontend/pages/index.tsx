@@ -93,6 +93,10 @@ export default function Home() {
 						</div>
 					))}
 				</div>
+
+				<button className="absolute bg-[#443b3b] bottom-48 rounded-md px-6 py-2 text-xl text-red-200">
+					Log out
+				</button>
 			</aside>
 			<section className="flex-1 grid grid-cols-dash">
 				<section className="px-12 pt-10 text-black-200">
