@@ -4,12 +4,14 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 
 import { getUser } from '../modules/user/user.repository';
+import { UserSecrets } from '../modules/user/user.schema';
 import {
 	createSecurityTokens,
 	getLoggedInUser,
 	session,
 	setLoggedInUser,
 } from '../modules/user/user.utils';
+import * as Cache from '../utils/cache';
 
 interface JwtAuthPayload {
 	user_id: string;
@@ -17,40 +19,43 @@ interface JwtAuthPayload {
 }
 
 export async function ensureUserIsAuthenticated(req: Request, res: Response, next: NextFunction) {
-	const token = getAccessToken(req);
-	const refreshToken = getRefreshToken(req);
+	let accessToken;
+	const refreshToken = req.headers['x-refresh-token'] as string | undefined;
 
-	if (!token || !refreshToken) {
+	if (req.headers.authorization) {
+		accessToken = req.headers.authorization.split(' ')[1];
+	}
+
+	if (!accessToken || !refreshToken) {
 		throw new Unauthorized('Please login');
 	}
 
-	const userData = jwt.decode(token) as JwtAuthPayload | null;
-
-	if (!userData) {
+	const tokenPayload = jwt.decode(accessToken) as JwtAuthPayload | null;
+	if (!tokenPayload) {
 		throw new Unauthorized('Please login');
 	}
 
-	const user = await getUser(userData.user_id);
+	let userSecrets = await Cache.getFromCache<UserSecrets>(`user:${tokenPayload.user_id}`);
 
-	if (!user) {
-		throw new Unauthorized('Please login');
+	if (!userSecrets) {
+		const user = await getUser(tokenPayload.user_id);
+		if (!user) {
+			throw new Unauthorized('Please login');
+		}
+
+		userSecrets = _.pick(user, ['access_token_secret', 'refresh_token_secret']);
 	}
 
-	jwt.verify(token, user.access_token_secret, async (err, payload) => {
+	jwt.verify(accessToken, userSecrets.access_token_secret, async (err, payload) => {
 		if (err && err.name === 'TokenExpiredError') {
 			// validate refresh token first
 			try {
-				jwt.verify(refreshToken, user.refresh_token_secret);
+				jwt.verify(refreshToken, userSecrets.refresh_token_secret);
 			} catch (error) {
 				throw new Unauthorized('Please login');
 			}
 
-			const securityPayload = _.pick(user, [
-				'id',
-				'first_name',
-				'access_token_secret',
-				'refresh_token_secret',
-			]);
+			const securityPayload = { ...payload, ...userSecrets };
 			const userToken = await createSecurityTokens(securityPayload);
 
 			res.set('x-access-token', userToken.accessToken);
@@ -81,26 +86,4 @@ export async function ensureUserAuthority(req: Request, _res: Response, next: Ne
 	}
 
 	next();
-}
-
-function getAccessToken(req: Request) {
-	if (req.headers.authorization) {
-		const parts = req.headers.authorization.split(' ');
-
-		if (parts.length !== 2) {
-			return null;
-		}
-
-		const [scheme, token] = parts;
-
-		if (/^Bearer$/i.test(scheme)) {
-			return token;
-		}
-	}
-
-	return null;
-}
-
-function getRefreshToken(req: Request) {
-	return req.headers['x-refresh-token'] as string | undefined;
 }

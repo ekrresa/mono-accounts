@@ -33,3 +33,7 @@ export type User = z.infer<typeof UserSchema>;
 export type UserInput = z.infer<typeof UserInputSchema>;
 export type LoginInput = z.infer<typeof LoginInputSchema>;
 export type UserSession = Pick<User, 'first_name'> & { user_id: string };
+export type UserSecrets = {
+	access_token_secret: string;
+	refresh_token_secret: string;
+};

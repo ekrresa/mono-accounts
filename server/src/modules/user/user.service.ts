@@ -3,8 +3,9 @@ import { BadRequest, Unauthorized } from 'http-errors';
 import _ from 'lodash';
 
 import * as UserRepo from './user.repository';
-import { LoginInput, UserInput } from './user.schema';
+import { LoginInput, UserInput, UserSecrets } from './user.schema';
 import { generateRandomString, generateUserId } from '../../utils';
+import * as Cache from '../../utils/cache';
 
 export async function refreshUserSecrets(userId: string) {
 	const accessTokenSecretPromise = generateRandomString();
@@ -34,7 +35,14 @@ export async function login(loginInput: LoginInput) {
 		throw new Unauthorized('Invalid email or password');
 	}
 
-	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
+	const payload = _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
+
+	cacheUserSecrets(payload.id, {
+		access_token_secret: payload.access_token_secret,
+		refresh_token_secret: payload.refresh_token_secret,
+	});
+
+	return payload;
 }
 
 export async function signUp(userInput: UserInput) {
@@ -65,9 +73,18 @@ export async function signUp(userInput: UserInput) {
 	});
 
 	await UserRepo.createUser(user);
+	cacheUserSecrets(userId, {
+		access_token_secret: accessTokenSecret,
+		refresh_token_secret: refreshTokenSecret,
+	});
+
 	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
 }
 
 export async function deleteUser(userId: string) {
 	await UserRepo.deleteUser(userId);
+}
+
+export async function cacheUserSecrets(userId: string, secrets: UserSecrets) {
+	await Cache.addToCache(`user:${userId}`, secrets);
 }
