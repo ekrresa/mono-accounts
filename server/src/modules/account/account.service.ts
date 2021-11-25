@@ -2,7 +2,7 @@ import { BadRequest } from 'http-errors';
 import _ from 'lodash';
 
 import * as AccountRepo from './account.repository';
-import { AccountInfo, AccountInput } from './account.schema';
+import { AccountInfo, AccountInput, TransactionsQuery } from './account.schema';
 import { axiosInstance } from '../../utils/request';
 import { generateUserId } from '../../utils';
 
@@ -30,6 +30,13 @@ export async function linkAccount(input: AccountInput) {
 export async function fetchAccountInfo(accountId: string): Promise<AccountInfo> {
 	const result = await axiosInstance.get(`/accounts/${accountId}`);
 	return result.data.account;
+}
+
+export async function fetchAccountTransactions(accountId: string, query: TransactionsQuery) {
+	const queryParams = new URLSearchParams(query).toString();
+
+	const result = await axiosInstance.get(`/accounts/${accountId}/transactions?${queryParams}`);
+	return result.data;
 }
 
 export async function getUserAccounts(userId: string) {

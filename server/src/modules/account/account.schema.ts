@@ -11,8 +11,8 @@ export const AccountInputSchema = z.object({
 	user_id: z.string(),
 });
 
-export const userIdSchema = AccountSchema.pick({ user_id: true });
-export const accountIdSchema = AccountSchema.pick({ account_id: true });
+export const UserIdSchema = AccountSchema.pick({ user_id: true });
+export const AccountIdSchema = AccountSchema.pick({ account_id: true });
 
 const AccountInfoSchema = z.object({
 	_id: z.string().optional(),
@@ -29,6 +29,19 @@ const AccountInfoSchema = z.object({
 	}),
 });
 
+export const TransactionsQuerySchema = z
+	.object({
+		limit: z.string().optional(),
+		type: z.enum(['credit', 'debit']).optional(),
+		start: z.string().optional(),
+		end: z.string().optional(),
+	})
+	.refine(val => !((val.start && !val.end) || (!val.start && val.end)), {
+		message: 'start and end params go together or not at all',
+		path: ['start'],
+	});
+
 export type Account = z.infer<typeof AccountSchema>;
 export type AccountInput = z.infer<typeof AccountInputSchema>;
 export type AccountInfo = z.infer<typeof AccountInfoSchema>;
+export type TransactionsQuery = z.infer<typeof TransactionsQuerySchema>;

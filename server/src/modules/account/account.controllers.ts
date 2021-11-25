@@ -14,6 +14,17 @@ export async function getUserAccountsHandler(req: Request, res: ApiResponse) {
 	res.status(200).json({ status: 200, message: 'user accounts fetched', data: userAccounts });
 }
 
+export async function getAccountTransactionsHandler(req: Request, res: ApiResponse) {
+	const transactions = await AccountService.fetchAccountTransactions(
+		req.params.account_id,
+		req.query
+	);
+
+	res
+		.status(200)
+		.json({ status: 200, message: 'transactions fetched successfully', data: transactions });
+}
+
 export async function unlinkAccountHandler(req: Request, res: ApiResponse) {
 	await AccountService.unlinkAccount(req.params.account_id);
 

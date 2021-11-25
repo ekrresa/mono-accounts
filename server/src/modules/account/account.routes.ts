@@ -1,20 +1,40 @@
 import { Router } from 'express';
 import * as AccountControllers from './account.controllers';
 import { ensureUserIsAuthenticated } from '../../middleware/auth.middleware';
-import { validateReqParams, validateSchema } from '../../middleware/validation.middleware';
-import { accountIdSchema, AccountInputSchema, userIdSchema } from './account.schema';
+import {
+	validateQueryParams,
+	validateReqParams,
+	validateSchema,
+} from '../../middleware/validation.middleware';
+import {
+	AccountIdSchema,
+	AccountInputSchema,
+	TransactionsQuerySchema,
+	UserIdSchema,
+} from './account.schema';
 
 const router = Router({ mergeParams: true });
 
 router.get(
+	'/:account_id/transactions',
+	[
+		ensureUserIsAuthenticated,
+		validateReqParams(AccountIdSchema),
+		//@ts-expect-error
+		validateQueryParams(TransactionsQuerySchema),
+	],
+	AccountControllers.getAccountTransactionsHandler
+);
+
+router.get(
 	'/user/:user_id',
-	[ensureUserIsAuthenticated, validateReqParams(userIdSchema)],
+	[ensureUserIsAuthenticated, validateReqParams(UserIdSchema)],
 	AccountControllers.getUserAccountsHandler
 );
 
 router.delete(
 	'/:account_id',
-	[ensureUserIsAuthenticated, validateReqParams(accountIdSchema)],
+	[ensureUserIsAuthenticated, validateReqParams(AccountIdSchema)],
 	AccountControllers.unlinkAccountHandler
 );
 
