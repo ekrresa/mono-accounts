@@ -33,7 +33,6 @@ export function useAccountTransactions(accountId: string, transactionsQuery: Tra
 		() => axiosInstance.get(`accounts/${accountId}/transactions?${queryParams}`),
 		{
 			enabled: Boolean(accountId),
-			refetchOnWindowFocus: true,
 			select: response => response.data.data,
 			staleTime: THREE_HOURS_IN_MILLISECONDS,
 		}
