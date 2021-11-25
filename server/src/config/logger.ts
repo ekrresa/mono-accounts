@@ -1,4 +1,5 @@
 import pino from 'pino';
+import { env } from './env';
 
 // log levels system
 const levels = {
@@ -15,10 +16,5 @@ export const logger = pino({
 	customLevels: levels,
 	useOnlyCustomLevels: true,
 	level: 'http',
-	transport: {
-		target: 'pino-pretty',
-		options: {
-			colorize: true,
-		},
-	},
+	prettyPrint: env.NODE_ENV === 'development',
 });
