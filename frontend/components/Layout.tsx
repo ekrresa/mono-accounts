@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import Link from 'next/link';
+import { NavLink } from './NavLink';
 import { DASHBOARD } from '../constants/routes';
 import LogoLight from '../public/images/logo-light.svg';
 
@@ -11,11 +12,9 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
 					<LogoLight className="w-32" />
 				</div>
 
-				<div className="opacity-50 text-white">
+				<div>
 					{Object.keys(DASHBOARD).map(key => (
-						<Link key={key} href={DASHBOARD[key]}>
-							<a className="block pb-8 text-[1.375rem] last:pb-0">{key}</a>
-						</Link>
+						<NavLink key={key} path={DASHBOARD[key]} className="pb-8 last:pb-0" text={key} />
 					))}
 				</div>
 
