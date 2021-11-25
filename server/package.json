@@ -5,6 +5,7 @@
 	"author": "Ochuko Ekrresa <kelvinekrresa@gmail.com>",
 	"main": "index.js",
 	"scripts": {
+		"build": "scripts/build.sh",
 		"build:watch": "tsc --watch",
 		"dev": "NODE_ENV=development node-dev dist/index.js --notify=false --respawn",
 		"start": "NODE_ENV=production node dist/index.js"
