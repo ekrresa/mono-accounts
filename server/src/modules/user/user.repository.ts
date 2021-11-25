@@ -1,5 +1,6 @@
 import { User } from './user.schema';
 import { UserModel } from './user.model';
+import { AccountModel } from '../account/account.model';
 
 export async function checkIfUserExists(email: string) {
 	return await UserModel.exists({ email });
@@ -19,4 +20,9 @@ export async function getUserByEmail(email: string) {
 
 export async function updateUser(userId: string, payload: Partial<User>) {
 	return await UserModel.findOneAndUpdate({ id: userId }, payload, { new: true }).lean();
+}
+
+export async function deleteUser(userId: string) {
+	await UserModel.deleteOne({ id: userId });
+	await AccountModel.deleteMany({ user_id: userId });
 }

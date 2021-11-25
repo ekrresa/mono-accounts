@@ -67,3 +67,7 @@ export async function signUp(userInput: UserInput) {
 	await UserRepo.createUser(user);
 	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
 }
+
+export async function deleteUser(userId: string) {
+	await UserRepo.deleteUser(userId);
+}

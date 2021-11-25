@@ -7,7 +7,9 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import store, { persistor } from '../stores';
 import '../styles/globals.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+	defaultOptions: { queries: { refetchOnWindowFocus: false, retry: false } },
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (

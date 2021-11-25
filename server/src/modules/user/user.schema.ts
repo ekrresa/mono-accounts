@@ -27,6 +27,8 @@ export const LoginInputSchema = z.object({
 		.min(6, { message: 'Password must be at least 6 characters' }),
 });
 
+export const UserIdSchema = z.object({ user_id: z.string() });
+
 export type User = z.infer<typeof UserSchema>;
 export type UserInput = z.infer<typeof UserInputSchema>;
 export type LoginInput = z.infer<typeof LoginInputSchema>;

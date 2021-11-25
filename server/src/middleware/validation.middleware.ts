@@ -7,3 +7,17 @@ export function validateSchema(schema: AnyZodObject) {
 		next();
 	};
 }
+
+export function validateReqParams(schema: AnyZodObject) {
+	return async function (req: Request, _res: Response, next: NextFunction) {
+		await schema.parseAsync(req.params);
+		next();
+	};
+}
+
+export function validateQueryParams(schema: AnyZodObject) {
+	return async function (req: Request, _res: Response, next: NextFunction) {
+		await schema.parseAsync(req.query);
+		next();
+	};
+}
