@@ -3,9 +3,9 @@ import { env } from './env';
 import { logger } from './logger';
 
 export const redis = new Redis({
-	host: '127.0.0.1',
-	port: 6379,
-	password: 'password123',
+	host: env.REDIS_HOST,
+	port: Number(env.REDIS_PORT),
+	password: env.REDIS_PASSWORD,
 	connectTimeout: 5000,
 	maxRetriesPerRequest: 3,
 	showFriendlyErrorStack: env.NODE_ENV === 'development',
