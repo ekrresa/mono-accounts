@@ -4,9 +4,10 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { BsDot } from 'react-icons/bs';
 import { FiCalendar } from 'react-icons/fi';
 import { IoEllipsisHorizontalSharp } from 'react-icons/io5';
+import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 import { format } from 'date-fns';
 
-import { accountsKeyFactory, useAccounts } from '../hooks/api/accounts';
+import { accountsKeyFactory, useAccounts, useAccountTransactions } from '../hooks/api/accounts';
 import { apiMutationHandler } from '../hooks/api/mutation';
 import { useAppSelector } from '../hooks/redux';
 import { DASHBOARD } from '../constants/routes';
@@ -28,6 +29,7 @@ export default function Home() {
 	const userAccounts = useAccounts(auth.user_id);
 	const { authCode, openMonoWidget } = useMonoWidget();
 	const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+	const transactions = useAccountTransactions(selectedAccount?.account_id!, { limit: '7' });
 
 	const linkAccountRequest = useMutation((payload: any) =>
 		apiMutationHandler({ url: '/accounts/link', body: payload, method: 'POST' })
@@ -60,6 +62,7 @@ export default function Home() {
 	}, [authCode]);
 
 	const deleteAccount = (accountId: string = '') => {
+		// Prompt user to confirm unlinking
 		if (accountId) {
 			unlinkAccountRequest.mutate(
 				{ accountId },
@@ -103,7 +106,9 @@ export default function Home() {
 						</button>
 					</div>
 
-					<h2 className="font-medium mt-10 text-xl text-center">Expense Tracker</h2>
+					<h2 className="font-medium mt-10 text-xl text-center">
+						Expense Tracker ({selectedAccount?.institution.name})
+					</h2>
 					<div className="border border-gray-300 h-52 mt-6 rounded"></div>
 
 					<div className="border-b border-gray-300 flex items-center justify-between mt-14 mb-4 pb-2 text-xl">
@@ -113,18 +118,24 @@ export default function Home() {
 						</button>
 					</div>
 
-					<div className="">
-						<div className="font-semibold flex items-center justify-between text-black-200">
-							<span>Jumia food</span>
-							<span>-10800</span>
+					{transactions.data?.data.map(transaction => (
+						<div key={transaction._id} className="mb-4">
+							<div className="font-medium flex items-center justify-between text-black-200">
+								<span className="max-w-sm truncate">{transaction.narration}</span>
+								<span>{formatAmount(transaction.balance / 100)}</span>
+							</div>
+							<div className="font-extralight mt-1 text-black-300 text-[0.9rem] tracking-wider flex items-center opacity-50">
+								<span>{format(new Date(transaction.date), 'dd-MM-yyyy')}</span>
+								<BsDot className="text-xl w-4" />
+								<span>{format(new Date(transaction.date), 'h:mm aaa')}</span>
+								<BsDot className="text-xl w-4" />
+								<span className="capitalize">{transaction.type}</span>
+							</div>
 						</div>
-						<div className="font-extralight mt-2 text-black-300 text-[0.95rem] flex items-center opacity-50">
-							<span>{format(new Date(), 'dd-MM-yyyy')}</span>
-							<BsDot className="text-xl w-4" />
-							<span>{format(new Date(), 'h:mm aaa')}</span>
-							<BsDot className="text-xl w-4" />
-							<span>Credit</span>
-						</div>
+					))}
+
+					<div className="flex items-center justify-center font-extralight mt-8 mb-4 text-sm">
+						VIEW ALL <MdOutlineKeyboardArrowRight className="ml-[0.1rem]" />
 					</div>
 				</section>
 
