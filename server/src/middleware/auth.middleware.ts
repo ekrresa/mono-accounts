@@ -22,13 +22,17 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 	let accessToken;
 	const refreshToken = req.headers['x-refresh-token'] as string | undefined;
 
+	if (req.headers.authorization) {
+		accessToken = req.headers.authorization.split(' ')[1];
+	}
+
 	if (!accessToken || !refreshToken) {
-		throw new Unauthorized('Please login');
+		throw new Unauthorized('Please login1');
 	}
 
 	const tokenPayload = jwt.decode(accessToken) as JwtAuthPayload | null;
 	if (!tokenPayload) {
-		throw new Unauthorized('Please login');
+		throw new Unauthorized('Please login2');
 	}
 
 	let userSecrets = await Cache.getFromCache<UserSecrets>(`user:${tokenPayload.user_id}`);
@@ -36,7 +40,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 	if (!userSecrets) {
 		const user = await getUser(tokenPayload.user_id);
 		if (!user) {
-			throw new Unauthorized('Please login');
+			throw new Unauthorized('Please login3');
 		}
 
 		userSecrets = _.pick(user, ['access_token_secret', 'refresh_token_secret']);
@@ -48,7 +52,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 			try {
 				jwt.verify(refreshToken, userSecrets.refresh_token_secret);
 			} catch (error) {
-				throw new Unauthorized('Please login');
+				throw new Unauthorized('Please login4');
 			}
 
 			const securityPayload = {
@@ -62,7 +66,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 		}
 
 		if (err && err.name !== 'TokenExpiredError') {
-			throw new Unauthorized('Please login');
+			throw new Unauthorized('Please login5');
 		}
 
 		session.run(() => {
