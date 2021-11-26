@@ -1,29 +1,31 @@
-import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import axios from 'axios';
+import { signIn, SignInResponse } from 'next-auth/client';
+import { useFormik } from 'formik';
+import { toast } from 'react-hot-toast';
 
+import { Button } from '../../components/Button';
 import CheckBox from '../../components/CheckBox';
-import { axiosInstance } from '../../utils/request';
 import LogoDark from '../../public/images/logo-dark.svg';
 
 export default function Login() {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
 	const router = useRouter();
+	const formik = useFormik({
+		initialValues: { email: '', password: '' },
+		onSubmit: async values => {
+			const response = (await signIn('login', {
+				...values,
+				redirect: false,
+			})) as unknown as SignInResponse;
 
-	const handleSubmit = async (e: FormEvent) => {
-		e.preventDefault();
-
-		try {
-			await axiosInstance.post('/auth/login', { email, password });
-			router.push('/');
-		} catch (error) {
-			if (axios.isAxiosError(error)) {
-				console.error(error.response?.data.message || error.message);
+			if (response.error) {
+				toast.error(response.error);
+				return;
 			}
-		}
-	};
+
+			router.push('/');
+		},
+	});
 
 	return (
 		<div className="bg-black-100 h-screen flex items-start justify-center">
@@ -33,18 +35,20 @@ export default function Login() {
 					Securely login to your account
 				</p>
 
-				<form className="mt-7 text-black-100" onSubmit={handleSubmit}>
+				<form className="mt-7 text-black-100" onSubmit={formik.handleSubmit}>
 					<input
 						className="block border border-gray-200 font-light placeholder-gray px-5 py-3 rounded-md focus:outline-none w-full"
 						placeholder="Email"
+						name="email"
 						type="email"
-						onChange={e => setEmail(e.currentTarget.value)}
+						onChange={formik.handleChange}
 					/>
 					<input
 						className="block border border-gray-200 mt-4 font-light placeholder-gray px-5 py-3 rounded-md focus:outline-none w-full"
 						placeholder="Password"
+						name="password"
 						type="password"
-						onChange={e => setPassword(e.currentTarget.value)}
+						onChange={formik.handleChange}
 					/>
 
 					<div className="flex justify-between my-6">
@@ -56,9 +60,14 @@ export default function Login() {
 						</p>
 					</div>
 
-					<button className="bg-blue font-light py-3 rounded-md text-white text-[1.06rem] w-full filter drop-shadow-first">
+					<Button
+						className="bg-blue font-light py-3 rounded-md text-white text-[1.06rem] w-full filter drop-shadow-first"
+						loading={formik.isSubmitting}
+						disabled={formik.isSubmitting}
+						type="submit"
+					>
 						LOG IN
-					</button>
+					</Button>
 				</form>
 
 				<p className="mt-12 text-blue text-center text-sm">
