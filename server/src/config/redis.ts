@@ -1,15 +1,25 @@
-import Redis from 'ioredis';
+import Redis, { Redis as RedisType } from 'ioredis';
 import { env } from './env';
 import { logger } from './logger';
 
-export const redis = new Redis({
-	host: env.REDIS_HOST,
-	port: Number(env.REDIS_PORT),
-	password: env.REDIS_PASSWORD,
-	connectTimeout: 5000,
-	maxRetriesPerRequest: 3,
-	showFriendlyErrorStack: env.NODE_ENV === 'development',
-});
+let redis: RedisType;
+
+if (env.REDIS_URL) {
+	redis = new Redis(env.REDIS_URL, {
+		connectTimeout: 5000,
+		maxRetriesPerRequest: 3,
+		showFriendlyErrorStack: env.NODE_ENV === 'development',
+	});
+} else {
+	redis = new Redis({
+		host: env.REDIS_HOST,
+		port: Number(env.REDIS_PORT),
+		password: env.REDIS_PASSWORD,
+		connectTimeout: 5000,
+		maxRetriesPerRequest: 3,
+		showFriendlyErrorStack: env.NODE_ENV === 'development',
+	});
+}
 
 redis.on('connect', () => logger.info('Redis connection established!'));
 redis.on('reconnecting', () => logger.info('reconnecting'));
@@ -23,3 +33,5 @@ redis.on('error', err => {
 		process.exit(1);
 	}
 });
+
+export { redis };

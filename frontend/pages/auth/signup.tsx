@@ -28,7 +28,7 @@ export default function SignUp() {
 
 	return (
 		<div className="bg-black-100 h-screen flex items-start justify-center">
-			<div className="bg-white rounded-[18.152px] flex-1 max-w-xl mt-32 px-4 py-12 text-center">
+			<div className="bg-white rounded-[18.152px] flex-1 max-w-xl mt-32 mx-4 px-4 py-12 text-center">
 				<LogoDark className="mx-auto w-40" />
 				<p className="font-light text-[0.938rem] mt-6 opacity-70 text-black-100">
 					Track all your bank expenses in one place
