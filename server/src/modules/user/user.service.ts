@@ -3,9 +3,11 @@ import { BadRequest, Unauthorized } from 'http-errors';
 import _ from 'lodash';
 
 import * as UserRepo from './user.repository';
+import * as AccountRepo from '../account/account.repository';
 import { LoginInput, UserInput, UserSecrets } from './user.schema';
 import { generateRandomString, generateUserId } from '../../utils';
 import * as Cache from '../../utils/cache';
+import { getLoggedInUser } from './user.utils';
 
 export async function refreshUserSecrets(userId: string) {
 	const accessTokenSecretPromise = generateRandomString();
@@ -81,8 +83,20 @@ export async function signUp(userInput: UserInput) {
 	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
 }
 
-export async function deleteUser(userId: string) {
+export async function deleteAccount(userId: string) {
+	const user = await UserRepo.getUser(userId);
+	const currentUser = getLoggedInUser();
+
+	if (!user) {
+		throw new BadRequest('user does not exist');
+	}
+
+	if (user.id !== currentUser.user_id) {
+		throw new Unauthorized('unauthorized action');
+	}
+
 	await UserRepo.deleteUser(userId);
+	await AccountRepo.deleteUserAccounts(userId);
 }
 
 export async function cacheUserSecrets(userId: string, secrets: UserSecrets) {

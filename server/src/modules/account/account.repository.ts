@@ -20,3 +20,7 @@ export async function getUserAccounts(userId: string) {
 export async function deleteAccount(accountId: string) {
 	return await AccountModel.findOneAndDelete({ account_id: accountId }).lean();
 }
+
+export async function deleteUserAccounts(userId: string) {
+	return await AccountModel.findOneAndDelete({ user_id: userId }).lean();
+}
