@@ -32,7 +32,7 @@ export default function FinalStep() {
 				}
 			);
 		}
-	}, [authCode]);
+	}, [authCode, linkAccountRequest, router, session?.user.user_id]);
 
 	return (
 		<div className="bg-white h-screen flex items-start justify-center">

@@ -59,7 +59,7 @@ export default function Home() {
 				}
 			);
 		}
-	}, [authCode]);
+	}, [authCode, linkAccountRequest, queryClient, session?.user.user_id]);
 
 	const deleteAccount = (accountId: string = '') => {
 		// Prompt user to confirm unlinking
