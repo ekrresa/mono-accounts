@@ -22,10 +22,6 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 	let accessToken;
 	const refreshToken = req.headers['x-refresh-token'] as string | undefined;
 
-	if (req.headers.authorization) {
-		accessToken = req.headers.authorization.split(' ')[1];
-	}
-
 	if (!accessToken || !refreshToken) {
 		throw new Unauthorized('Please login');
 	}
@@ -55,11 +51,14 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 				throw new Unauthorized('Please login');
 			}
 
-			const securityPayload = { ...payload, ...userSecrets };
+			const securityPayload = {
+				...{ id: tokenPayload.user_id, first_name: tokenPayload.first_name },
+				...userSecrets,
+			};
+
 			const userToken = await createSecurityTokens(securityPayload);
 
 			res.set('x-access-token', userToken.accessToken);
-			res.set('x-refresh-token', userToken.refreshToken);
 		}
 
 		if (err && err.name !== 'TokenExpiredError') {
