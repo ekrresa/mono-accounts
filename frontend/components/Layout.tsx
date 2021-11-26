@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import Link from 'next/link';
+import { signOut } from 'next-auth/client';
 import { NavLink } from './NavLink';
 import { DASHBOARD } from '../constants/routes';
 import LogoLight from '../public/images/logo-light.svg';
@@ -18,7 +18,12 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
 					))}
 				</div>
 
-				<button className="absolute bg-[#443b3b] bottom-48 rounded-md px-6 py-2 text-xl text-red-200">
+				<button
+					className="absolute bg-[#443b3b] bottom-48 rounded-md px-6 py-2 text-xl text-red-200"
+					onClick={() => {
+						signOut({ redirect: false });
+					}}
+				>
 					Log out
 				</button>
 			</aside>

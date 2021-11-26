@@ -5,17 +5,15 @@ import { BsDot } from 'react-icons/bs';
 import { FiCalendar } from 'react-icons/fi';
 import { IoEllipsisHorizontalSharp } from 'react-icons/io5';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import { useSession } from 'next-auth/client';
 import { format } from 'date-fns';
 
 import { accountsKeyFactory, useAccounts, useAccountTransactions } from '../hooks/api/accounts';
 import { apiMutationHandler } from '../hooks/api/mutation';
-import { useAppSelector } from '../hooks/redux';
-import { DASHBOARD } from '../constants/routes';
 import { useMonoWidget } from '../hooks/useMonoWidget';
 import { Layout } from '../components/Layout';
 import { formatAmount, getBankInitials, getGreeting } from '../utils';
 import { Account } from '../types/app';
-import LogoLight from '../public/images/logo-light.svg';
 
 function getTotalBalance(accounts: Account[]) {
 	return accounts.reduce((total, account) => {
@@ -24,13 +22,14 @@ function getTotalBalance(accounts: Account[]) {
 }
 
 export default function Home() {
+	const [session] = useSession();
 	const queryClient = useQueryClient();
-	const auth = useAppSelector(state => state.auth);
-	const totalBalance = useAccounts(auth.user_id, getTotalBalance);
-	const userAccounts = useAccounts(auth.user_id);
+	const totalBalance = useAccounts(session?.user.user_id, getTotalBalance);
+	const userAccounts = useAccounts(session?.user.user_id);
 	const { authCode, openMonoWidget } = useMonoWidget();
 	const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 	const transactions = useAccountTransactions(selectedAccount?.account_id!, { limit: '7' });
+	console.log(session);
 
 	const linkAccountRequest = useMutation((payload: any) =>
 		apiMutationHandler({ url: '/accounts/link', body: payload, method: 'POST' })
@@ -48,7 +47,7 @@ export default function Home() {
 	useEffect(() => {
 		if (authCode) {
 			linkAccountRequest.mutate(
-				{ account_code: authCode, user_id: auth.user_id },
+				{ account_code: authCode, user_id: session?.user.user_id },
 				{
 					onError: (err: any) => {
 						console.log(err.response);
@@ -85,7 +84,7 @@ export default function Home() {
 			<section className="px-12 pt-10 text-black-200">
 				<div className="flex items-center justify-between">
 					<div className="font-normal text-black-200">
-						{getGreeting()}, {auth.first_name}
+						{getGreeting()}, {session?.user.first_name}
 					</div>
 					<button className="border border-gray-200 flex items-center shadow px-2 py-1 rounded text-sm text-black-200">
 						Today
@@ -180,3 +179,4 @@ export default function Home() {
 }
 
 Home.getLayout = (page: ComponentType) => <Layout>{page}</Layout>;
+Home.protected = true;
