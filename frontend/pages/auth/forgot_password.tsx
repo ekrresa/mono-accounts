@@ -4,13 +4,13 @@ import LogoDark from '../../public/images/logo-dark.svg';
 export default function ForgotPassword() {
 	return (
 		<div className="bg-black-100 h-screen flex items-start justify-center">
-			<div className="bg-white rounded-[18.152px] flex-1 max-w-xl mt-32 px-8 sm:px-28 py-12 text-center">
+			<div className="bg-white rounded-[18.152px] flex-1 max-w-xl mt-32 mx-4 px-4 py-12 text-center">
 				<LogoDark className="mx-auto w-40" />
 				<p className="font-light text-[0.938rem] mt-6 opacity-70 text-black-100">
 					Verify your email to reset your password
 				</p>
 
-				<form className="mt-7 text-black-100">
+				<form className="mt-7 text-black-100 max-w-md mx-auto">
 					<input
 						className="block border border-gray-200 font-light placeholder-gray px-5 py-3 rounded-md focus:outline-none w-full"
 						placeholder="Email"
