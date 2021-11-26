@@ -32,6 +32,8 @@ module.exports = {
 			},
 			screens: {
 				xs: '480px',
+				sidebar: '1160px',
+				mobile: '920px',
 			},
 		},
 	},
