@@ -18,7 +18,7 @@ axiosClient.interceptors.response.use(
 	},
 	async (error: AxiosError) => {
 		if (error.response?.status === 401 || error.response?.status === 403) {
-			return await signOut();
+			return await signOut({ redirect: false });
 		}
 
 		return Promise.reject(error);
