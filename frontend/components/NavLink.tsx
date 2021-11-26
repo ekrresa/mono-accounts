@@ -14,7 +14,7 @@ export function NavLink({ className, path, text }: NavLinkProps) {
 	return (
 		<Link href={path} passHref>
 			<a
-				className={`block hover:opacity-100 cursor-pointer opacity-50 text-white text-[1.375rem] ${className} ${
+				className={`block hover:opacity-100 cursor-pointer opacity-50 text-white ${className} ${
 					isActive && 'opacity-100'
 				}`}
 			>

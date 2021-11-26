@@ -28,14 +28,14 @@ export default function SignUp() {
 
 	return (
 		<div className="bg-black-100 h-screen flex items-start justify-center">
-			<div className="bg-white rounded-[18.152px] flex-1 max-w-xl mt-32 px-8 sm:px-28 py-12 text-center">
+			<div className="bg-white rounded-[18.152px] flex-1 max-w-xl mt-32 px-4 py-12 text-center">
 				<LogoDark className="mx-auto w-40" />
 				<p className="font-light text-[0.938rem] mt-6 opacity-70 text-black-100">
 					Track all your bank expenses in one place
 				</p>
 
-				<form className="mt-7 text-black-100" onSubmit={formik.handleSubmit}>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
+				<form className="mt-7 text-black-100 max-w-md mx-auto" onSubmit={formik.handleSubmit}>
+					<div className="grid grid-cols-1 xs:grid-cols-2 gap-7">
 						<input
 							name="first_name"
 							className="border border-gray-200 font-light placeholder-gray px-5 py-3 rounded-md focus:outline-none"
@@ -66,7 +66,7 @@ export default function SignUp() {
 					/>
 
 					<p className="my-6 opacity-70 font-light text-right text-sm">
-						<Link href="/forgot_password" passHref>
+						<Link href="/auth/forgot_password" passHref>
 							<a>I forgot my password</a>
 						</Link>
 					</p>
@@ -83,7 +83,7 @@ export default function SignUp() {
 
 				<p className="mt-12 text-blue text-center text-sm">
 					Already have an account?
-					<Link href="/login" passHref>
+					<Link href="/auth/login" passHref>
 						<a className="ml-2 underline">Sign in</a>
 					</Link>
 				</p>

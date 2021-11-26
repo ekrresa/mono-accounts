@@ -92,10 +92,10 @@ export default function Home() {
 	};
 
 	return (
-		<section className="flex-1 grid grid-cols-dash">
-			<section className="px-12 pt-10 text-black-200">
-				<div className="flex items-center justify-between">
-					<div className="font-normal text-black-200">
+		<section className="bg-white-sky flex-1 grid grid-cols-1 mobile:grid-cols-dash">
+			<section className="bg-white px-12 pt-10 text-black-200">
+				<div className="flex items-center justify-center mobile:justify-between">
+					<div className="hidden mobile:inline-block font-normal text-black-200">
 						{getGreeting()}, <span className="capitalize">{session?.user.first_name}</span>
 					</div>
 					<button className="border border-gray-200 flex items-center shadow px-2 py-1 rounded text-sm text-black-200">
@@ -121,7 +121,7 @@ export default function Home() {
 					transactions.data?.data.map(transaction => (
 						<div key={transaction._id} className="mb-4">
 							<div className="font-medium flex items-center justify-between text-black-200">
-								<span className="max-w-sm truncate">{transaction.narration}</span>
+								<span className="max-w-sm mr-4 truncate">{transaction.narration}</span>
 								<span>{formatAmount(transaction.balance / 100)}</span>
 							</div>
 							<div className="font-extralight mt-1 text-black-300 text-[0.9rem] tracking-wider flex items-center opacity-50">
@@ -157,11 +157,15 @@ export default function Home() {
 				) : null}
 			</section>
 
-			<section className="bg-white-sky px-12 pt-10 text-center text-black-200">
-				<div className="bg-white rounded-[10px] px-6 pt-8 pb-6 shadow-md">
+			<section className="bg-white-sky px-12 pt-10 order-first mobile:order-1 text-center text-black-200">
+				<div className="bg-white rounded-[10px] mb-10 px-6 pt-8 pb-6 shadow-md">
+					<p className="mobile:hidden font-normal mb-4 opacity-80 text-xl tracking-wide text-black-200">
+						{getGreeting()}, <span className="capitalize">{session?.user.first_name} 👋</span>
+					</p>
+
 					<p className="font-medium text-lg">TOTAL BALANCE</p>
 
-					<p className="font-semibold mt-4 text-5xl">
+					<p className="font-semibold text-5xl mobile:mt-4">
 						{totalBalance.data && formatAmount(Number(totalBalance.data) / 100, 0)}
 					</p>
 
