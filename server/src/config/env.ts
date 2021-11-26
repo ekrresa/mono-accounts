@@ -6,6 +6,9 @@ const envSchema = z.object({
 	MONO_SECRET_KEY: z.string(),
 	NODE_ENV: z.string(),
 	PORT: z.string(),
+	REDIS_HOST: z.string(),
+	REDIS_PORT: z.string(),
+	REDIS_PASSWORD: z.string(),
 });
 
 function loadEnvConfig() {

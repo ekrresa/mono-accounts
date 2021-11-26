@@ -1,10 +1,11 @@
-import { ComponentType, useEffect, useState } from 'react';
+import { ComponentType, useEffect, useCallback, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { BsDot } from 'react-icons/bs';
 import { FiCalendar } from 'react-icons/fi';
 import { IoEllipsisHorizontalSharp } from 'react-icons/io5';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/client';
 import { format } from 'date-fns';
 
@@ -14,6 +15,8 @@ import { useMonoWidget } from '../hooks/useMonoWidget';
 import { Layout } from '../components/Layout';
 import { formatAmount, getBankInitials, getGreeting } from '../utils';
 import { Account } from '../types/app';
+import { Button } from '../components/Button';
+import { Prompt } from '../components/Prompt';
 
 function getTotalBalance(accounts: Account[]) {
 	return accounts.reduce((total, account) => {
@@ -26,10 +29,10 @@ export default function Home() {
 	const queryClient = useQueryClient();
 	const totalBalance = useAccounts(session?.user.user_id, getTotalBalance);
 	const userAccounts = useAccounts(session?.user.user_id);
-	const { authCode, openMonoWidget } = useMonoWidget();
+	const { authCode, openMonoWidget, setAuthCode } = useMonoWidget();
 	const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+	const [isOpen, setIsOpen] = useState(false);
 	const transactions = useAccountTransactions(selectedAccount?.account_id!, { limit: '7' });
-	console.log(session);
 
 	const linkAccountRequest = useMutation((payload: any) =>
 		apiMutationHandler({ url: '/accounts/link', body: payload, method: 'POST' })
@@ -38,6 +41,23 @@ export default function Home() {
 		apiMutationHandler({ url: `/accounts/${payload.accountId}`, method: 'DELETE' })
 	);
 
+	const linkAccount = useCallback((code: string, userId: string) => {
+		linkAccountRequest.mutate(
+			{ account_code: code, user_id: userId },
+			{
+				onError: (err: any) => {
+					setAuthCode('');
+					toast.error(err?.response?.data.message || err.message);
+				},
+				onSuccess: async () => {
+					setAuthCode('');
+					toast.success('Your account has been linked!');
+					await queryClient.invalidateQueries(accountsKeyFactory.accounts());
+				},
+			}
+		);
+	}, []);
+
 	useEffect(() => {
 		if (userAccounts.data && Array.isArray(userAccounts.data) && !selectedAccount) {
 			setSelectedAccount(userAccounts.data[0]);
@@ -45,38 +65,30 @@ export default function Home() {
 	}, [selectedAccount, userAccounts.data]);
 
 	useEffect(() => {
-		if (authCode) {
-			linkAccountRequest.mutate(
-				{ account_code: authCode, user_id: session?.user.user_id },
-				{
-					onError: (err: any) => {
-						console.log(err.response);
-					},
-					onSuccess: async () => {
-						//Display toasts
-						await queryClient.invalidateQueries(accountsKeyFactory.accounts());
-					},
-				}
-			);
+		if (authCode && session?.user.user_id) {
+			linkAccount(authCode, session.user.user_id);
 		}
-	}, [authCode, linkAccountRequest, queryClient, session?.user.user_id]);
+	}, [authCode, linkAccount, session?.user.user_id]);
 
-	const deleteAccount = (accountId: string = '') => {
-		// Prompt user to confirm unlinking
-		if (accountId) {
-			unlinkAccountRequest.mutate(
-				{ accountId },
-				{
-					onError: (err: any) => {
-						console.log(err.response);
-					},
-					onSuccess: async () => {
-						//Display toasts
-						await queryClient.invalidateQueries(accountsKeyFactory.accounts());
-					},
-				}
-			);
+	const unlinkAccount = (accountId: string = '') => {
+		if (!accountId) {
+			toast.error(`It appears you haven't linked an account!`);
+			return;
 		}
+
+		unlinkAccountRequest.mutate(
+			{ accountId },
+			{
+				onError: (err: any) => {
+					toast.error(err?.response?.data.message || err.message);
+				},
+				onSuccess: async () => {
+					toast.success('Your account has been removed!');
+					await queryClient.invalidateQueries(accountsKeyFactory.accounts());
+					setIsOpen(false);
+				},
+			}
+		);
 	};
 
 	return (
@@ -84,7 +96,7 @@ export default function Home() {
 			<section className="px-12 pt-10 text-black-200">
 				<div className="flex items-center justify-between">
 					<div className="font-normal text-black-200">
-						{getGreeting()}, {session?.user.first_name}
+						{getGreeting()}, <span className="capitalize">{session?.user.first_name}</span>
 					</div>
 					<button className="border border-gray-200 flex items-center shadow px-2 py-1 rounded text-sm text-black-200">
 						Today
@@ -93,7 +105,8 @@ export default function Home() {
 				</div>
 
 				<h2 className="font-medium mt-10 text-xl text-center">
-					Expense Tracker ({selectedAccount?.institution.name})
+					Expense Tracker{' '}
+					{selectedAccount?.institution.name && `(${selectedAccount?.institution.name})`}
 				</h2>
 				<div className="border border-gray-300 h-52 mt-6 rounded"></div>
 
@@ -104,35 +117,53 @@ export default function Home() {
 					</button>
 				</div>
 
-				{transactions.data?.data.map(transaction => (
-					<div key={transaction._id} className="mb-4">
-						<div className="font-medium flex items-center justify-between text-black-200">
-							<span className="max-w-sm truncate">{transaction.narration}</span>
-							<span>{formatAmount(transaction.balance / 100)}</span>
+				{transactions.isSuccess ? (
+					transactions.data?.data.map(transaction => (
+						<div key={transaction._id} className="mb-4">
+							<div className="font-medium flex items-center justify-between text-black-200">
+								<span className="max-w-sm truncate">{transaction.narration}</span>
+								<span>{formatAmount(transaction.balance / 100)}</span>
+							</div>
+							<div className="font-extralight mt-1 text-black-300 text-[0.9rem] tracking-wider flex items-center opacity-50">
+								<span>{format(new Date(transaction.date), 'dd-MM-yyyy')}</span>
+								<BsDot className="text-xl w-4" />
+								<span>{format(new Date(transaction.date), 'h:mm aaa')}</span>
+								<BsDot className="text-xl w-4" />
+								<span className="capitalize">{transaction.type}</span>
+							</div>
 						</div>
-						<div className="font-extralight mt-1 text-black-300 text-[0.9rem] tracking-wider flex items-center opacity-50">
-							<span>{format(new Date(transaction.date), 'dd-MM-yyyy')}</span>
-							<BsDot className="text-xl w-4" />
-							<span>{format(new Date(transaction.date), 'h:mm aaa')}</span>
-							<BsDot className="text-xl w-4" />
-							<span className="capitalize">{transaction.type}</span>
-						</div>
+					))
+				) : (
+					<div className="text-center">
+						<p>
+							It appears you haven't linked an account. Please click the button below to start the
+							process.
+						</p>
+						<Button
+							className="bg-black-100 mx-auto mt-4 px-4 py-2 rounded text-white"
+							onClick={openMonoWidget}
+							loading={linkAccountRequest.isLoading}
+							disabled={linkAccountRequest.isLoading}
+						>
+							LINK ACCOUNT
+						</Button>
 					</div>
-				))}
+				)}
 
-				<div className="flex items-center justify-center font-extralight mt-8 mb-4 text-sm">
-					VIEW ALL <MdOutlineKeyboardArrowRight className="ml-[0.1rem]" />
-				</div>
+				{transactions.isSuccess && transactions.data?.data.length > 0 ? (
+					<div className="flex items-center justify-center font-extralight mt-8 mb-4 text-sm">
+						VIEW ALL <MdOutlineKeyboardArrowRight className="ml-[0.1rem]" />
+					</div>
+				) : null}
 			</section>
 
 			<section className="bg-white-sky px-12 pt-10 text-center text-black-200">
 				<div className="bg-white rounded-[10px] px-6 pt-8 pb-6 shadow-md">
 					<p className="font-medium text-lg">TOTAL BALANCE</p>
-					{totalBalance.data && (
-						<p className="font-semibold mt-4 text-5xl">
-							{formatAmount(Number(totalBalance.data) / 100, 0)}
-						</p>
-					)}
+
+					<p className="font-semibold mt-4 text-5xl">
+						{totalBalance.data && formatAmount(Number(totalBalance.data) / 100, 0)}
+					</p>
 
 					<p className="font-extralight mt-1 opacity-70 tracking-wider">
 						Your balance across all Banks
@@ -164,14 +195,20 @@ export default function Home() {
 						</button>
 					</div>
 
-					<button
-						className="bg-red-100 font-medium px-6 py-4 rounded-xl tracking-wider text-red"
-						onClick={() => {
-							deleteAccount(selectedAccount?.account_id);
-						}}
+					<Button
+						className="bg-red-100 font-medium mx-auto px-6 py-4 rounded-xl tracking-wider text-red"
+						onClick={() => setIsOpen(true)}
+						disabled={unlinkAccountRequest.isLoading}
+						loading={unlinkAccountRequest.isLoading}
 					>
 						UNLINK BANK ACCOUNT
-					</button>
+					</Button>
+					<Prompt
+						context="Are you sure you want to unlink your account?"
+						affirmFn={() => unlinkAccount(selectedAccount?.account_id)}
+						isOpen={isOpen}
+						closePrompt={() => setIsOpen(false)}
+					/>
 				</div>
 			</section>
 		</section>

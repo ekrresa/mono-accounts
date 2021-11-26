@@ -1,20 +1,10 @@
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
-import { z } from 'zod';
 
 export type Page<P = {}> = NextPage<P> & {
 	getLayout?: (page: ReactElement) => ReactNode;
 	protected?: boolean;
 };
-
-export const AuthStateSchema = z.object({
-	accessToken: z.string(),
-	refreshToken: z.string(),
-	first_name: z.string(),
-	user_id: z.string(),
-});
-
-export type AuthState = z.infer<typeof AuthStateSchema>;
 
 export type ApiResponse<T> = {
 	status: number;

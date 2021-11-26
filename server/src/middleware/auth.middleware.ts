@@ -4,12 +4,14 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 
 import { getUser } from '../modules/user/user.repository';
+import { UserSecrets } from '../modules/user/user.schema';
 import {
 	createSecurityTokens,
 	getLoggedInUser,
 	session,
 	setLoggedInUser,
 } from '../modules/user/user.utils';
+import * as Cache from '../utils/cache';
 
 interface JwtAuthPayload {
 	user_id: string;
@@ -17,52 +19,58 @@ interface JwtAuthPayload {
 }
 
 export async function ensureUserIsAuthenticated(req: Request, res: Response, next: NextFunction) {
-	const token = getAccessToken(req);
-	const refreshToken = getRefreshToken(req);
+	let accessToken;
+	const refreshToken = req.headers['x-refresh-token'] as string | undefined;
 
-	if (!token || !refreshToken) {
-		throw new Unauthorized('Please login');
+	if (req.headers.authorization) {
+		accessToken = req.headers.authorization.split(' ')[1];
 	}
 
-	const userData = jwt.decode(token) as JwtAuthPayload | null;
-
-	if (!userData) {
-		throw new Unauthorized('Please login');
+	if (!accessToken || !refreshToken) {
+		throw new Unauthorized('Please login1');
 	}
 
-	const user = await getUser(userData.user_id);
-
-	if (!user) {
-		throw new Unauthorized('Please login');
+	const tokenPayload = jwt.decode(accessToken) as JwtAuthPayload | null;
+	if (!tokenPayload) {
+		throw new Unauthorized('Please login2');
 	}
 
-	jwt.verify(token, user.access_token_secret, async (err, payload) => {
+	let userSecrets = await Cache.getFromCache<UserSecrets>(`user:${tokenPayload.user_id}`);
+
+	if (!userSecrets) {
+		const user = await getUser(tokenPayload.user_id);
+		if (!user) {
+			throw new Unauthorized('Please login3');
+		}
+
+		userSecrets = _.pick(user, ['access_token_secret', 'refresh_token_secret']);
+	}
+
+	jwt.verify(accessToken, userSecrets.access_token_secret, async err => {
 		if (err && err.name === 'TokenExpiredError') {
 			// validate refresh token first
 			try {
-				jwt.verify(refreshToken, user.refresh_token_secret);
+				jwt.verify(refreshToken, userSecrets.refresh_token_secret);
 			} catch (error) {
-				throw new Unauthorized('Please login');
+				throw new Unauthorized('Please login4');
 			}
 
-			const securityPayload = _.pick(user, [
-				'id',
-				'first_name',
-				'access_token_secret',
-				'refresh_token_secret',
-			]);
+			const securityPayload = {
+				...{ id: tokenPayload.user_id, first_name: tokenPayload.first_name },
+				...userSecrets,
+			};
+
 			const userToken = await createSecurityTokens(securityPayload);
 
 			res.set('x-access-token', userToken.accessToken);
-			res.set('x-refresh-token', userToken.refreshToken);
 		}
 
 		if (err && err.name !== 'TokenExpiredError') {
-			throw new Unauthorized('Please login');
+			throw new Unauthorized('Please login5');
 		}
 
 		session.run(() => {
-			setLoggedInUser(payload as JwtAuthPayload);
+			setLoggedInUser(_.pick(tokenPayload, ['first_name', 'user_id']));
 			next();
 		});
 	});
@@ -81,26 +89,4 @@ export async function ensureUserAuthority(req: Request, _res: Response, next: Ne
 	}
 
 	next();
-}
-
-function getAccessToken(req: Request) {
-	if (req.headers.authorization) {
-		const parts = req.headers.authorization.split(' ');
-
-		if (parts.length !== 2) {
-			return null;
-		}
-
-		const [scheme, token] = parts;
-
-		if (/^Bearer$/i.test(scheme)) {
-			return token;
-		}
-	}
-
-	return null;
-}
-
-function getRefreshToken(req: Request) {
-	return req.headers['x-refresh-token'] as string | undefined;
 }
