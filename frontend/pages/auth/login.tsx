@@ -72,7 +72,7 @@ export default function Login() {
 
 				<p className="mt-12 text-blue text-center text-sm">
 					Don't have an account?
-					<Link href="/signup" passHref>
+					<Link href="/auth/signup" passHref>
 						<a className="ml-2 underline">Sign up</a>
 					</Link>
 				</p>
