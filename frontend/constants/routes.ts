@@ -1,8 +1,8 @@
 export const DASHBOARD: Record<string, string> = {
 	Dashboard: '/',
-	Expenses: '/expenses',
-	Wallets: '/wallets',
-	Summary: '/summary',
-	Accounts: '/accounts',
+	Expenses: '#',
+	Wallets: '#',
+	Summary: '#',
+	Accounts: '#',
 	Settings: '/settings',
 };

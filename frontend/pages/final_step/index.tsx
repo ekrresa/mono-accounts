@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
 import { useMutation } from 'react-query';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/client';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { RiArrowRightUpLine } from 'react-icons/ri';
 
 import { useMonoWidget } from '../../hooks/useMonoWidget';
-import { useAppSelector } from '../../hooks/redux';
 import { apiMutationHandler } from '../../hooks/api/mutation';
 import Lock from '../../public/images/lock.svg';
 
 export default function FinalStep() {
 	const router = useRouter();
-	const userId = useAppSelector(state => state.auth.user_id);
+	const [session] = useSession();
 	const { authCode, openMonoWidget } = useMonoWidget();
 	const linkAccountRequest = useMutation((payload: any) =>
 		apiMutationHandler({ url: '/accounts/link', body: payload, method: 'POST' })
@@ -20,7 +20,7 @@ export default function FinalStep() {
 	useEffect(() => {
 		if (authCode) {
 			linkAccountRequest.mutate(
-				{ account_code: authCode, user_id: userId },
+				{ account_code: authCode, user_id: session?.user.user_id },
 				{
 					onError: (err: any) => {
 						console.log(err.response);
@@ -32,7 +32,7 @@ export default function FinalStep() {
 				}
 			);
 		}
-	}, [authCode]);
+	}, [authCode, linkAccountRequest, router, session?.user.user_id]);
 
 	return (
 		<div className="bg-white h-screen flex items-start justify-center">

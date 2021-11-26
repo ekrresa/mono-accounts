@@ -1,24 +1,28 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useFormik } from 'formik';
-import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { signIn, SignInResponse } from 'next-auth/client';
 
-import { axiosInstance } from '../../utils/request';
+import { Button } from '../../components/Button';
 import LogoDark from '../../public/images/logo-dark.svg';
 
 export default function SignUp() {
 	const router = useRouter();
+
 	const formik = useFormik({
 		initialValues: { first_name: '', last_name: '', email: '', password: '' },
 		onSubmit: async values => {
-			try {
-				await axiosInstance.post('/auth/signup', values);
-				router.push('/final_step');
-			} catch (error) {
-				if (axios.isAxiosError(error)) {
-					console.error(error.response?.data.message || error.message);
-				}
+			const response = (await signIn('register', {
+				...values,
+				redirect: false,
+			})) as unknown as SignInResponse;
+			if (response.error) {
+				toast.error(response.error);
+				return;
 			}
+
+			router.push('/final_step');
 		},
 	});
 
@@ -67,12 +71,14 @@ export default function SignUp() {
 						</Link>
 					</p>
 
-					<button
+					<Button
 						className="bg-blue font-light py-3 rounded-md text-white text-[1.06rem] w-full filter drop-shadow-first"
+						loading={formik.isSubmitting}
+						disabled={formik.isSubmitting}
 						type="submit"
 					>
 						GET STARTED
-					</button>
+					</Button>
 				</form>
 
 				<p className="mt-12 text-blue text-center text-sm">

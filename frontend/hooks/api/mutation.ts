@@ -1,4 +1,4 @@
-import { axiosInstance } from '../../utils/request';
+import { axiosClient } from '../../utils/request';
 
 interface MutationOptions {
 	body?: any;
@@ -7,5 +7,5 @@ interface MutationOptions {
 }
 
 export async function apiMutationHandler({ url, body, method }: MutationOptions) {
-	return await axiosInstance({ method, url, data: body });
+	return await axiosClient({ method, url, data: body });
 }
