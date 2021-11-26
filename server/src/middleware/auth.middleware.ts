@@ -46,7 +46,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 		userSecrets = _.pick(user, ['access_token_secret', 'refresh_token_secret']);
 	}
 
-	jwt.verify(accessToken, userSecrets.access_token_secret, async (err, payload) => {
+	jwt.verify(accessToken, userSecrets.access_token_secret, async err => {
 		if (err && err.name === 'TokenExpiredError') {
 			// validate refresh token first
 			try {
@@ -70,7 +70,7 @@ export async function ensureUserIsAuthenticated(req: Request, res: Response, nex
 		}
 
 		session.run(() => {
-			setLoggedInUser(payload as JwtAuthPayload);
+			setLoggedInUser(_.pick(tokenPayload, ['first_name', 'user_id']));
 			next();
 		});
 	});

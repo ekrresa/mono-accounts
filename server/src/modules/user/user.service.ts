@@ -83,20 +83,18 @@ export async function signUp(userInput: UserInput) {
 	return _.pick(user, ['id', 'first_name', 'access_token_secret', 'refresh_token_secret']);
 }
 
-export async function deleteAccount(userId: string) {
-	const user = await UserRepo.getUser(userId);
+export async function deleteAccount() {
 	const currentUser = getLoggedInUser();
 
-	if (!user) {
-		throw new BadRequest('user does not exist');
+	console.log({ currentUser });
+
+	const result = await UserRepo.deleteUser(currentUser.user_id);
+
+	if (result.deletedCount === 1) {
+		return await AccountRepo.deleteUserAccounts(currentUser.user_id);
 	}
 
-	if (user.id !== currentUser.user_id) {
-		throw new Unauthorized('unauthorized action');
-	}
-
-	await UserRepo.deleteUser(userId);
-	await AccountRepo.deleteUserAccounts(userId);
+	throw new BadRequest('user does not exist');
 }
 
 export async function cacheUserSecrets(userId: string, secrets: UserSecrets) {

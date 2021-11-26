@@ -22,5 +22,5 @@ export async function updateUser(userId: string, payload: Partial<User>) {
 }
 
 export async function deleteUser(userId: string) {
-	await UserModel.deleteOne({ id: userId });
+	return await UserModel.deleteOne({ id: userId }).lean();
 }
