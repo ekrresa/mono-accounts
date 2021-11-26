@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 export function useMonoWidget() {
 	const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -23,5 +23,5 @@ export function useMonoWidget() {
 		monoInstance.open();
 	}, []);
 
-	return { openMonoWidget, authCode };
+	return useMemo(() => ({ openMonoWidget, authCode, setAuthCode }), [authCode, openMonoWidget]);
 }
