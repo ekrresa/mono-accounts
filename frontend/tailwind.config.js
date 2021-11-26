@@ -30,6 +30,9 @@ module.exports = {
 			gridTemplateColumns: {
 				dash: '1.2fr 1fr',
 			},
+			screens: {
+				xs: '480px',
+			},
 		},
 	},
 	variants: {

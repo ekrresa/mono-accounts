@@ -23,7 +23,7 @@ export default function ForgotPassword() {
 
 				<p className="mt-12 text-blue text-center text-sm">
 					Already have an account?
-					<Link href="/login" passHref>
+					<Link href="/auth/login" passHref>
 						<a className="ml-2 underline">Sign in</a>
 					</Link>
 				</p>
